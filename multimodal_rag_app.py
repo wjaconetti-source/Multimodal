@@ -647,7 +647,8 @@ For each product you recommend:
   - Quote the exact price and rating from the context (do not estimate).
   - Explain in 1–2 sentences why it matches the query.
 If a product in the context closely matches but is not a perfect match, recommend it and note the difference.
-If no relevant product exists in the context, say: "I couldn't find a matching product in the catalogue."
+If retrieved products are present in the context, you MUST recommend the closest match even if it is not perfect — explain how it relates to the query.
+Only say "I couldn't find a matching product" if the context section is completely empty.
 Never invent product names, prices, ratings, or features not present in the context."""
 
 
@@ -695,7 +696,7 @@ def _effective_query(query, query_type, query_image_pil=None):
 
 
 
-def answer_standard(query, results, hf_token, model_id, query_type="Text only"):
+def answer_standard(query, results, hf_token, model_id, query_type="Text only", query_image_pil=None):
     ctx = format_context(results)
     q = _effective_query(query, query_type, query_image_pil)
     return llm_call([
@@ -1082,7 +1083,7 @@ with col_chat:
                             query.strip(), query_image_pil, query_type,
                             col_obj, k_val, alpha
                         )
-                        answer = answer_standard(query, results, hf_token, model_id, query_type)
+                        answer = answer_standard(query, results, hf_token, model_id, query_type, query_image_pil)
 
                     elif strategy == "Multi-Query":
                         answer, results, alts = answer_multi_query(

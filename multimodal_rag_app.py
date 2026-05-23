@@ -572,7 +572,7 @@ def retrieve(query_text, query_image_pil, query_type, collection_obj, k, alpha):
     if query_type == "Text only":
         # At index time, text-only products used text_emb with alpha=0 image contribution
         # Match by querying with text emb fused against zero image vector
-        emb = _fused_index_emb(t_emb, None, alpha=0.5)
+        emb = _fused_index_emb(t_emb, None, alpha=0.0)
     elif query_type == "Image only":
         # Fuse image against zero text to match indexed embedding space
         emb = _fused_index_emb(None, i_emb, alpha=0.5)
@@ -644,10 +644,11 @@ RAG_SYSTEM = """You are a helpful Amazon product shopping assistant.
 Use ONLY the product information provided in the context below.
 For each product you recommend:
   - State the exact product name as it appears in the context.
-  - Quote the exact price and rating from the context (do not estimate).
+  - Quote the first clean price value (e.g. $49.99) from the context.
+  - Quote the exact rating from the context.
   - Explain in 1–2 sentences why it matches the query.
-If a product in the context closely matches but is not a perfect match, recommend it and note the difference.
-If no relevant product exists in the context, say: "I couldn't find a matching product in the catalogue."
+You MUST recommend the closest matching product from the context even if it is not a perfect match.
+Only say "I couldn't find a matching product" if the context contains zero products.
 Never invent product names, prices, ratings, or features not present in the context."""
 
 
@@ -662,6 +663,29 @@ def format_context(results):
         parts.append(line)
     return "\n\n---\n\n".join(parts)
 
+import re
+
+def _clean_price(price: str) -> str:
+    """Extract first clean price like $49.99 from messy strings."""
+    match = re.search(r'\$[\d,]+\.?\d*', str(price))
+    return match.group(0) if match else price
+
+def format_context(results):
+    parts = []
+    for i, r in enumerate(results, 1):
+        meta = r["meta"]
+        clean_price = _clean_price(meta.get("price", ""))
+        line = f"[Product {i}]\n{r['doc']}"
+        if clean_price:
+            line += f"\nPrice: {clean_price}"
+        img = meta.get("image_url", "")
+        if img:
+            line += f"\nImage URL: {img}"
+        parts.append(line)
+    return "\n\n---\n\n".join(parts)
+
+
+
 def _describe_image_for_llm(pil_img) -> str:
     """
     Generate a concise text description of the uploaded image using CLIP
@@ -669,9 +693,10 @@ def _describe_image_for_llm(pil_img) -> str:
     This bridges the gap between image retrieval and LLM text reasoning.
     """
     candidate_labels = [
-        "sports merchandise", "electronics", "clothing", "kitchen appliance",
-        "toy", "book", "home decor", "outdoor equipment", "beauty product",
-        "office supply", "coin bank", "collectible", "NFL football",
+    "gaming headset", "wireless headphones", "bluetooth speaker",
+    "laptop stand", "USB hub", "mechanical keyboard", "webcam",
+    "ring light", "stand mixer", "kitchen appliance", "running shoes",
+    "electronics", "clothing", "toy", "book", "home decor", "beauty product",
     ]
     text_embs = _encode_texts(candidate_labels)
     img_emb = _encode_image_pil(pil_img)
@@ -695,7 +720,7 @@ def _effective_query(query, query_type, query_image_pil=None):
 
 
 
-def answer_standard(query, results, hf_token, model_id, query_type="Text only"):
+def answer_standard(query, results, hf_token, model_id, query_type="Text only", query_image_pil=None):
     ctx = format_context(results)
     q = _effective_query(query, query_type, query_image_pil)
     return llm_call([
@@ -1083,7 +1108,7 @@ with col_chat:
                             query.strip(), query_image_pil, query_type,
                             col_obj, k_val, alpha
                         )
-                        answer = answer_standard(query, results, hf_token, model_id, query_type)
+                        answer = answer_standard(query, results, hf_token, model_id, query_type, query_image_pil)
 
                     elif strategy == "Multi-Query":
                         answer, results, alts = answer_multi_query(

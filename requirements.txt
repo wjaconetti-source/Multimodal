@@ -1,0 +1,17 @@
+streamlit
+python-dotenv
+groq
+chromadb
+open-clip-torch
+torch
+torchvision
+Pillow
+requests
+numpy
+pandas
+langchain
+langchain-community
+langchain-core
+tiktoken
+huggingface_hub
+tqdm

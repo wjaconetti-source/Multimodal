@@ -647,8 +647,8 @@ For each product you recommend:
   - Quote the exact price and rating from the context (do not estimate).
   - Explain in 1–2 sentences why it matches the query.
 If a product in the context closely matches but is not a perfect match, recommend it and note the difference.
-If retrieved products are present in the context, you MUST recommend the closest match even if it is not perfect — explain how it relates to the query.
-Only say "I couldn't find a matching product" if the context section is completely empty.
+You MUST recommend products from the context. If retrieved products are present, always recommend the top match by name, price, and rating — never say you couldn't find a match when products are listed in the context.
+Only say "I couldn't find a matching product" if the context is completely empty with zero products listed.
 Never invent product names, prices, ratings, or features not present in the context."""
 
 
@@ -670,9 +670,10 @@ def _describe_image_for_llm(pil_img) -> str:
     This bridges the gap between image retrieval and LLM text reasoning.
     """
     candidate_labels = [
-        "sports merchandise", "electronics", "clothing", "kitchen appliance",
-        "toy", "book", "home decor", "outdoor equipment", "beauty product",
-        "office supply", "coin bank", "collectible", "NFL football",
+    "gaming headset", "wireless headphones", "electronics", "bluetooth speaker",
+    "laptop accessory", "keyboard", "mouse", "monitor", "gaming controller",
+    "sports merchandise", "clothing", "kitchen appliance", "toy", "book",
+    "home decor", "beauty product", "office supply", "collectible",
     ]
     text_embs = _encode_texts(candidate_labels)
     img_emb = _encode_image_pil(pil_img)

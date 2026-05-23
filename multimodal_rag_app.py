@@ -647,8 +647,7 @@ For each product you recommend:
   - Quote the exact price and rating from the context (do not estimate).
   - Explain in 1–2 sentences why it matches the query.
 If a product in the context closely matches but is not a perfect match, recommend it and note the difference.
-You MUST recommend products from the context. If retrieved products are present, always recommend the top match by name, price, and rating — never say you couldn't find a match when products are listed in the context.
-Only say "I couldn't find a matching product" if the context is completely empty with zero products listed.
+If no relevant product exists in the context, say: "I couldn't find a matching product in the catalogue."
 Never invent product names, prices, ratings, or features not present in the context."""
 
 
@@ -670,10 +669,9 @@ def _describe_image_for_llm(pil_img) -> str:
     This bridges the gap between image retrieval and LLM text reasoning.
     """
     candidate_labels = [
-    "gaming headset", "wireless headphones", "electronics", "bluetooth speaker",
-    "laptop accessory", "keyboard", "mouse", "monitor", "gaming controller",
-    "sports merchandise", "clothing", "kitchen appliance", "toy", "book",
-    "home decor", "beauty product", "office supply", "collectible",
+        "sports merchandise", "electronics", "clothing", "kitchen appliance",
+        "toy", "book", "home decor", "outdoor equipment", "beauty product",
+        "office supply", "coin bank", "collectible", "NFL football",
     ]
     text_embs = _encode_texts(candidate_labels)
     img_emb = _encode_image_pil(pil_img)
@@ -697,7 +695,7 @@ def _effective_query(query, query_type, query_image_pil=None):
 
 
 
-def answer_standard(query, results, hf_token, model_id, query_type="Text only", query_image_pil=None):
+def answer_standard(query, results, hf_token, model_id, query_type="Text only"):
     ctx = format_context(results)
     q = _effective_query(query, query_type, query_image_pil)
     return llm_call([
@@ -865,8 +863,9 @@ st.markdown("""
 <div class="app-header">
   <div class="header-eyebrow">🛍️ Powered by CLIP · Groq · ChromaDB</div>
   <h1 class="header-title">Amazon Product <em>AI</em></h1>
-  <p class="header-sub">Search by text, image, or both — multimodal product intelligence</p>
-  <div class="amber-rule"></div>
+<p class="header-sub">Search by text, image, or both — multimodal product intelligence</p>
+<p style="font-size:0.75rem; color:#3a5060; margin-top:0.5rem;">Brought to you by Bill & Anmol, UChicago Class ADS 32027, Created May 2026</p>
+<div class="amber-rule"></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -878,15 +877,15 @@ with st.sidebar:
     st.markdown('<div style="margin-top:1rem"></div>', unsafe_allow_html=True)
 
     # ── Credentials ──
-    #st.markdown('<span class="sb-label">🔑 Groq API Key</span>', unsafe_allow_html=True)
-    #groq_key_input = st.text_input(
-    #    "Groq Key", type="password",
-    #    value=os.environ.get("GROQ_API_KEY", ""),
-    #    placeholder="gsk_...",
-    #   label_visibility="collapsed",
-    #)
-    #if groq_key_input:
-    #    os.environ["GROQ_API_KEY"] = groq_key_input
+    st.markdown('<span class="sb-label">🔑 Groq API Key</span>', unsafe_allow_html=True)
+    groq_key_input = st.text_input(
+        "Groq Key", type="password",
+        value=os.environ.get("GROQ_API_KEY", ""),
+        placeholder="gsk_...",
+        label_visibility="collapsed",
+    )
+    if groq_key_input:
+        os.environ["GROQ_API_KEY"] = groq_key_input
     hf_token = ""  # kept for function signatures, unused
 
     st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
@@ -1084,7 +1083,7 @@ with col_chat:
                             query.strip(), query_image_pil, query_type,
                             col_obj, k_val, alpha
                         )
-                        answer = answer_standard(query, results, hf_token, model_id, query_type, query_image_pil)
+                        answer = answer_standard(query, results, hf_token, model_id, query_type)
 
                     elif strategy == "Multi-Query":
                         answer, results, alts = answer_multi_query(

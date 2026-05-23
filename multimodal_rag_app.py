@@ -878,15 +878,15 @@ with st.sidebar:
     st.markdown('<div style="margin-top:1rem"></div>', unsafe_allow_html=True)
 
     # ── Credentials ──
-    st.markdown('<span class="sb-label">🔑 Groq API Key</span>', unsafe_allow_html=True)
-    groq_key_input = st.text_input(
-        "Groq Key", type="password",
-        value=os.environ.get("GROQ_API_KEY", ""),
-        placeholder="gsk_...",
-        label_visibility="collapsed",
-    )
-    if groq_key_input:
-        os.environ["GROQ_API_KEY"] = groq_key_input
+    #st.markdown('<span class="sb-label">🔑 Groq API Key</span>', unsafe_allow_html=True)
+    #groq_key_input = st.text_input(
+    #    "Groq Key", type="password",
+    #    value=os.environ.get("GROQ_API_KEY", ""),
+    #    placeholder="gsk_...",
+    #   label_visibility="collapsed",
+    #)
+    #if groq_key_input:
+    #    os.environ["GROQ_API_KEY"] = groq_key_input
     hf_token = ""  # kept for function signatures, unused
 
     st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)

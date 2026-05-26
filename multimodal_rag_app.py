@@ -39,16 +39,17 @@ st.set_page_config(
 # ── CSS ───────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap');
 
 /* ── Reset & base ── */
 html, body, [class*="css"] {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
 }
 
-/* ── App background: deep navy-to-slate ── */
+/* ── App background: deep blue-slate ── */
 .stApp {
-    background: #080d14;
+    background: #141824;
     min-height: 100vh;
 }
 
@@ -58,9 +59,9 @@ html, body, [class*="css"] {
     position: fixed;
     inset: 0;
     background-image:
-        linear-gradient(rgba(255,200,60,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,200,60,0.025) 1px, transparent 1px);
-    background-size: 48px 48px;
+        linear-gradient(rgba(212,168,67,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212,168,67,0.018) 1px, transparent 1px);
+    background-size: 52px 52px;
     pointer-events: none;
     z-index: 0;
 }
@@ -68,164 +69,164 @@ html, body, [class*="css"] {
 /* ── Header ── */
 .app-header {
     position: relative;
-    padding: 2.8rem 2rem 2rem;
+    padding: 3rem 2rem 2rem;
     text-align: center;
-    border-bottom: 1px solid rgba(255,200,60,0.12);
+    border-bottom: 1px solid rgba(212,168,67,0.15);
     margin-bottom: 0;
     overflow: hidden;
 }
 .app-header::before {
     content: '';
     position: absolute;
-    top: -60px; left: 50%; transform: translateX(-50%);
-    width: 500px; height: 200px;
-    background: radial-gradient(ellipse, rgba(255,180,30,0.10) 0%, transparent 70%);
+    top: -80px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 260px;
+    background: radial-gradient(ellipse, rgba(212,168,67,0.07) 0%, transparent 70%);
     pointer-events: none;
 }
 .header-eyebrow {
     font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
+    font-size: 0.70rem;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #ff9f1c;
-    margin-bottom: 0.7rem;
+    color: #d4a843;
+    margin-bottom: 0.8rem;
 }
 .header-title {
     font-family: 'DM Serif Display', serif;
-    font-size: 2.8rem;
+    font-size: 2.9rem;
     font-weight: 400;
-    color: #f5ede0;
+    color: #d4a843;
     line-height: 1.15;
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.6rem;
+    letter-spacing: -0.01em;
 }
 .header-title em {
     font-style: italic;
-    color: #ff9f1c;
+    color: #e8c870;
 }
 .header-sub {
-    color: #8aa0b0;
-    font-size: 0.95rem;
-    font-weight: 300;
+    color: #7a8fa8;
+    font-size: 0.92rem;
+    font-weight: 400;
     margin: 0;
+    letter-spacing: 0.01em;
 }
 .amber-rule {
-    width: 48px; height: 2px;
-    background: linear-gradient(90deg, #ff9f1c, #ffcc44);
-    margin: 1.1rem auto 0;
+    width: 52px; height: 2px;
+    background: linear-gradient(90deg, #c49030, #d4a843, #e8c870);
+    margin: 1.2rem auto 0;
     border-radius: 2px;
 }
 
 /* ── Sidebar ── */
 section[data-testid="stSidebar"] {
-    background: #0c1420 !important;
-    border-right: 1px solid rgba(255,200,60,0.10);
+    background: #1a1f2e !important;
+    border-right: 1px solid rgba(212,168,67,0.12);
 }
-.sb-section {
-    margin-bottom: 1.5rem;
+.sb-section-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.80rem;
+    font-weight: 600;
+    color: #d4a843;
+    letter-spacing: 0.02em;
+    margin-bottom: 1rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.sb-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(212,168,67,0.20);
+    margin-left: 0.4rem;
 }
 .sb-label {
-    font-family: 'DM Mono', monospace;
-    color: #ffcc44;
-    font-size: 0.78rem;
-    letter-spacing: 0.14em;
+    font-family: 'Inter', sans-serif;
+    color: #8a9ab0;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    margin-bottom: 0.45rem;
+    font-weight: 500;
+    margin-bottom: 0.35rem;
     display: block;
 }
 .sb-divider {
     height: 1px;
-    background: rgba(255,200,60,0.08);
-    margin: 1.2rem 0;
+    background: rgba(212,168,67,0.10);
+    margin: 1.0rem 0;
 }
 
 /* ── Input overrides ── */
 .stTextArea textarea, .stTextInput input {
-    background: rgba(255,255,255,0.06) !important;
-    border: 1px solid rgba(255,200,60,0.40) !important;
-    border-radius: 10px !important;
-    color: #f5ede0 !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-size: 1.0rem !important;
-    caret-color: #ff9f1c !important;
+    background: #1e2436 !important;
+    border: 1px solid rgba(212,168,67,0.35) !important;
+    border-radius: 8px !important;
+    color: #e8e0d0 !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.96rem !important;
+    caret-color: #d4a843 !important;
     transition: border-color 0.2s, box-shadow 0.2s !important;
+    padding: 0.75rem 1rem !important;
 }
 .stTextArea textarea::placeholder, .stTextInput input::placeholder {
-    color: #8aa0b0 !important;
+    color: #5a6a7a !important;
     opacity: 1 !important;
+    font-style: italic;
 }
 .stTextArea textarea:focus, .stTextInput input:focus {
-    border-color: rgba(255,159,28,0.80) !important;
-    box-shadow: 0 0 0 3px rgba(255,159,28,0.14) !important;
+    border-color: rgba(212,168,67,0.70) !important;
+    box-shadow: 0 0 0 3px rgba(212,168,67,0.10) !important;
+    outline: none !important;
 }
 
 /* ── File uploader ── */
 [data-testid="stFileUploader"] {
-    background: rgba(255,255,255,0.04) !important;
-    border: 1px dashed rgba(255,200,60,0.50) !important;
-    border-radius: 10px !important;
+    background: #1e2436 !important;
+    border: 1px dashed rgba(212,168,67,0.40) !important;
+    border-radius: 8px !important;
 }
 
 /* ── Buttons ── */
 .stButton > button {
-    background: linear-gradient(135deg, #e08a10 0%, #ff9f1c 50%, #ffc640 100%) !important;
-    color: #0c0e12 !important;
+    background: #d4a843 !important;
+    color: #0f1218 !important;
     border: none !important;
     border-radius: 8px !important;
-    font-family: 'DM Sans', sans-serif !important;
+    font-family: 'Inter', sans-serif !important;
     font-weight: 600 !important;
-    font-size: 0.93rem !important;
-    letter-spacing: 0.03em !important;
-    padding: 0.5rem 1.6rem !important;
-    transition: all 0.18s ease !important;
-    box-shadow: 0 2px 12px rgba(255,159,28,0.22) !important;
+    font-size: 0.90rem !important;
+    letter-spacing: 0.02em !important;
+    padding: 0.55rem 1.6rem !important;
+    transition: all 0.15s ease !important;
+    box-shadow: 0 1px 8px rgba(212,168,67,0.20) !important;
 }
 .stButton > button:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 22px rgba(255,159,28,0.38) !important;
+    background: #e8bc55 !important;
+    box-shadow: 0 4px 16px rgba(212,168,67,0.30) !important;
+    transform: translateY(-1px) !important;
 }
 .stButton > button:active {
     transform: translateY(0) !important;
-}
-
-/* ── Mode selector pills ── */
-.mode-pills {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-.mode-pill {
-    flex: 1;
-    text-align: center;
-    padding: 0.45rem 0.5rem;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    cursor: pointer;
-    border: 1px solid rgba(255,200,60,0.18);
-    background: rgba(255,255,255,0.02);
-    color: #6a8090;
-    transition: all 0.15s;
-}
-.mode-pill.active {
-    background: rgba(255,159,28,0.14);
-    border-color: rgba(255,159,28,0.5);
-    color: #ff9f1c;
+    background: #c49030 !important;
 }
 
 /* ── Strategy badge ── */
 .strat-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    background: rgba(255,159,28,0.10);
-    border: 1px solid rgba(255,159,28,0.28);
-    color: #ffb030;
+    gap: 0.3rem;
+    background: rgba(212,168,67,0.08);
+    border: 1px solid rgba(212,168,67,0.30);
+    color: #d4a843;
     font-family: 'DM Mono', monospace;
     font-size: 0.72rem;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    padding: 0.28rem 0.75rem;
+    padding: 0.30rem 0.80rem;
     border-radius: 20px;
+    font-weight: 500;
 }
 
 /* ── Chat bubble: user ── */
@@ -238,23 +239,23 @@ section[data-testid="stSidebar"] {
 }
 .bubble-user .bubble-body {
     max-width: 72%;
-    background: rgba(255,159,28,0.12);
-    border: 1px solid rgba(255,159,28,0.25);
-    border-radius: 18px 4px 18px 18px;
-    padding: 0.9rem 1.2rem;
-    color: #f0e0c0;
-    font-size: 1rem;
+    background: rgba(212,168,67,0.10);
+    border: 1px solid rgba(212,168,67,0.22);
+    border-radius: 16px 4px 16px 16px;
+    padding: 0.85rem 1.2rem;
+    color: #e8ddc8;
+    font-size: 0.96rem;
     line-height: 1.6;
 }
 .bubble-user .avatar {
-    width: 34px; height: 34px;
+    width: 32px; height: 32px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ff9f1c, #ffcc44);
+    background: #d4a843;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1rem;
+    font-size: 0.85rem;
     flex-shrink: 0;
     margin-top: 2px;
-    color: #0c0e12;
+    color: #0f1218;
     font-weight: 700;
 }
 
@@ -268,54 +269,54 @@ section[data-testid="stSidebar"] {
 }
 .bubble-ai .bubble-body {
     max-width: 85%;
-    background: rgba(255,255,255,0.038);
-    border: 1px solid rgba(255,200,60,0.14);
-    border-left: 3px solid #ff9f1c;
-    border-radius: 4px 18px 18px 18px;
-    padding: 1.1rem 1.4rem;
-    color: #e8dfc8;
-    font-size: 0.97rem;
+    background: rgba(255,255,255,0.030);
+    border: 1px solid rgba(212,168,67,0.12);
+    border-left: 3px solid #d4a843;
+    border-radius: 4px 16px 16px 16px;
+    padding: 1.0rem 1.3rem;
+    color: #ddd5c0;
+    font-size: 0.94rem;
     line-height: 1.75;
 }
 .bubble-ai .avatar {
-    width: 34px; height: 34px;
+    width: 32px; height: 32px;
     border-radius: 50%;
-    background: rgba(255,159,28,0.12);
-    border: 1px solid rgba(255,159,28,0.28);
+    background: rgba(212,168,67,0.10);
+    border: 1px solid rgba(212,168,67,0.25);
     display: flex; align-items: center; justify-content: center;
-    font-size: 1rem;
+    font-size: 0.95rem;
     flex-shrink: 0;
     margin-top: 2px;
 }
 
 /* ── Image preview in chat ── */
 .img-preview-wrap {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,200,60,0.14);
-    border-radius: 10px;
-    padding: 0.7rem;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(212,168,67,0.12);
+    border-radius: 8px;
+    padding: 0.65rem;
     margin-top: 0.5rem;
     display: inline-block;
 }
 .img-preview-label {
     font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.14em;
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #ff9f1c;
-    margin-bottom: 0.4rem;
+    color: #d4a843;
+    margin-bottom: 0.35rem;
 }
 
 /* ── Product cards ── */
 .products-header {
     font-family: 'DM Mono', monospace;
-    font-size: 0.68rem;
-    letter-spacing: 0.16em;
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #8aa0b0;
+    color: #7a8fa8;
     margin: 1.4rem 0 0.8rem;
     padding-top: 1rem;
-    border-top: 1px solid rgba(255,200,60,0.08);
+    border-top: 1px solid rgba(212,168,67,0.08);
 }
 .product-grid {
     display: grid;
@@ -324,149 +325,187 @@ section[data-testid="stSidebar"] {
     margin-bottom: 0.5rem;
 }
 .product-card {
-    background: rgba(255,255,255,0.025);
-    border: 1px solid rgba(255,200,60,0.12);
+    background: #1e2436;
+    border: 1px solid rgba(212,168,67,0.10);
     border-radius: 10px;
     padding: 0.9rem 1rem;
     transition: border-color 0.2s, background 0.2s;
 }
 .product-card:hover {
-    border-color: rgba(255,159,28,0.32);
-    background: rgba(255,159,28,0.05);
+    border-color: rgba(212,168,67,0.28);
+    background: rgba(212,168,67,0.04);
 }
 .product-rank {
     font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    color: #ff9f1c;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.4rem;
-    opacity: 0.7;
+    font-size: 0.63rem;
+    color: #d4a843;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.35rem;
+    opacity: 0.75;
 }
 .product-name {
-    color: #d8cbb0;
-    font-size: 0.88rem;
+    color: #c8bea8;
+    font-size: 0.86rem;
     font-weight: 500;
-    line-height: 1.4;
+    line-height: 1.45;
     margin-bottom: 0.5rem;
 }
 .product-meta {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.4rem;
     flex-wrap: wrap;
 }
 .product-tag {
     font-family: 'DM Mono', monospace;
-    font-size: 0.68rem;
-    padding: 0.18rem 0.5rem;
+    font-size: 0.66rem;
+    padding: 0.16rem 0.45rem;
     border-radius: 4px;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
 }
 .tag-price {
-    background: rgba(100,200,100,0.10);
-    color: #70d080;
-    border: 1px solid rgba(100,200,100,0.2);
+    background: rgba(80,180,80,0.08);
+    color: #60c070;
+    border: 1px solid rgba(80,180,80,0.18);
 }
 .tag-rating {
-    background: rgba(255,200,60,0.08);
-    color: #ffc030;
-    border: 1px solid rgba(255,200,60,0.2);
+    background: rgba(212,168,67,0.08);
+    color: #d4a843;
+    border: 1px solid rgba(212,168,67,0.18);
 }
 .tag-category {
-    background: rgba(100,160,220,0.08);
-    color: #80b0d8;
-    border: 1px solid rgba(100,160,220,0.15);
+    background: rgba(80,140,210,0.07);
+    color: #70a8d0;
+    border: 1px solid rgba(80,140,210,0.14);
 }
 .tag-sim {
-    background: rgba(180,100,220,0.08);
-    color: #c090e0;
-    border: 1px solid rgba(180,100,220,0.18);
+    background: rgba(160,90,210,0.07);
+    color: #b080d8;
+    border: 1px solid rgba(160,90,210,0.16);
 }
 
 /* ── Metrics row ── */
 .metrics-strip {
     display: flex;
-    gap: 0.7rem;
+    gap: 0.6rem;
     margin: 0.6rem 0 1.2rem;
 }
 .metric-chip {
     flex: 1;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,200,60,0.10);
+    background: #1e2436;
+    border: 1px solid rgba(212,168,67,0.10);
     border-radius: 8px;
-    padding: 0.55rem 0.8rem;
+    padding: 0.55rem 0.7rem;
     text-align: center;
 }
 .metric-val {
     font-family: 'DM Serif Display', serif;
-    font-size: 1.45rem;
-    color: #ff9f1c;
+    font-size: 1.35rem;
+    color: #d4a843;
     line-height: 1;
     margin-bottom: 0.2rem;
 }
 .metric-lbl {
     font-family: 'DM Mono', monospace;
-    font-size: 0.62rem;
-    letter-spacing: 0.12em;
+    font-size: 0.60rem;
+    letter-spacing: 0.10em;
     text-transform: uppercase;
-    color: #8aa0b0;
+    color: #7a8fa8;
 }
 
 /* ── Empty state ── */
 .empty-state {
     text-align: center;
     padding: 5rem 2rem;
-    color: #8aa0b0;
+    color: #7a8fa8;
 }
 .empty-icon {
-    font-size: 3.5rem;
+    font-size: 3.2rem;
     margin-bottom: 1.2rem;
-    opacity: 0.5;
+    opacity: 0.45;
 }
 .empty-title {
     font-family: 'DM Serif Display', serif;
     font-size: 1.5rem;
-    color: #c8d8e8;
+    color: #a8b8c8;
     margin-bottom: 0.6rem;
 }
 .empty-sub {
-    font-size: 0.88rem;
-    color: #8aa0b0;
+    font-size: 0.86rem;
+    color: #7a8fa8;
+    line-height: 1.6;
 }
 
 /* ── Selectbox / slider ── */
 .stSelectbox label, .stSlider label, .stRadio label, label {
-    color: #c8d8e8 !important;
-    font-size: 0.88rem !important;
+    color: #a8b8c8 !important;
+    font-size: 0.84rem !important;
 }
 div[data-testid="stSelectbox"] > div {
-    background: rgba(255,255,255,0.06) !important;
-    border-color: rgba(255,200,60,0.40) !important;
-    color: #f5ede0 !important;
+    background: #1e2436 !important;
+    border-color: rgba(212,168,67,0.35) !important;
+    color: #e8e0d0 !important;
     border-radius: 8px !important;
 }
 
-/* ── Slider ── */
+/* ── Slider track & thumb ── */
+[data-testid="stSlider"] [role="slider"] {
+    background: #d4a843 !important;
+    border-color: #d4a843 !important;
+}
+[data-testid="stSlider"] > div > div > div > div {
+    background: linear-gradient(90deg, #d4a843, #d4a843) !important;
+}
 [data-testid="stSlider"] [data-testid="stThumbValue"] {
-    color: #ff9f1c !important;
+    color: #d4a843 !important;
+    font-size: 0.80rem !important;
 }
 
 /* ── Expander ── */
 .streamlit-expanderHeader {
-    background: rgba(255,255,255,0.04) !important;
-    color: #c8d8e8 !important;
-    border-color: rgba(255,200,60,0.20) !important;
+    background: #1e2436 !important;
+    color: #a8b8c8 !important;
+    border-color: rgba(212,168,67,0.18) !important;
     border-radius: 8px !important;
+    font-size: 0.88rem !important;
 }
 
 /* ── Spinner / alerts ── */
-.stSpinner > div { border-top-color: #ff9f1c !important; }
-.stAlert { border-radius: 10px !important; }
+.stSpinner > div { border-top-color: #d4a843 !important; }
+.stAlert { border-radius: 8px !important; }
 
 /* ── Dividers ── */
-hr { border-color: rgba(255,200,60,0.08) !important; }
+hr { border-color: rgba(212,168,67,0.08) !important; }
 
 /* ── Caption ── */
-.stCaption { color: #8aa0b0 !important; }
+.stCaption { color: #7a8fa8 !important; font-size: 0.78rem !important; }
+
+/* ── Radio buttons ── */
+[data-testid="stRadio"] label {
+    color: #a8b8c8 !important;
+    font-size: 0.88rem !important;
+}
+[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
+    font-size: 0.88rem !important;
+    color: #a8b8c8 !important;
+}
+
+/* ── Metrics widget ── */
+[data-testid="stMetric"] label {
+    color: #7a8fa8 !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.06em !important;
+}
+[data-testid="stMetricValue"] {
+    color: #d4a843 !important;
+    font-size: 1.6rem !important;
+    font-family: 'DM Serif Display', serif !important;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #141824; }
+::-webkit-scrollbar-thumb { background: rgba(212,168,67,0.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(212,168,67,0.40); }
 </style>
 """, unsafe_allow_html=True)
 
@@ -890,11 +929,9 @@ for key, default in [
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="app-header">
-  <div class="header-eyebrow">🛍️ Powered by CLIP · Groq · ChromaDB</div>
-  <h1 class="header-title">Amazon Product <em>AI</em></h1>
-<p class="header-sub">Search by text, image, or both — multimodal product intelligence</p>
-<p style="font-size:0.75rem; color:#3a5060; margin-top:0.5rem;">Brought to you by Bill & Anmol, UChicago Class ADS 32027, Created May 2026</p>
-<div class="amber-rule"></div>
+  <h1 class="header-title">🛍️ Amazon Product <em>AI</em></h1>
+  <p class="header-sub">Ask anything about products, search by image, or combine both modalities</p>
+  <div class="amber-rule"></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -903,10 +940,11 @@ st.markdown("""
 # Sidebar
 # ─────────────────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown('<div style="margin-top:1rem"></div>', unsafe_allow_html=True)
+    st.markdown('<div style="margin-top:0.5rem"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="sb-section-title">⚙ Configuration</div>', unsafe_allow_html=True)
 
     # ── Credentials ──
-    st.markdown('<span class="sb-label">🔑 Groq API Key</span>', unsafe_allow_html=True)
+    st.markdown('<span class="sb-label">Groq API Key</span>', unsafe_allow_html=True)
     groq_key_input = st.text_input(
         "Groq Key", type="password",
         value=os.environ.get("GROQ_API_KEY", ""),
@@ -920,13 +958,13 @@ with st.sidebar:
     st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
 
     # ── Vector store ──
-    st.markdown('<span class="sb-label">📁 ChromaDB Path</span>', unsafe_allow_html=True)
+    st.markdown('<span class="sb-label">Vector Store Path</span>', unsafe_allow_html=True)
     persist_dir = st.text_input(
         "DB Path", value="./chroma_amazon_mm",
         label_visibility="collapsed",
     )
 
-    st.markdown('<span class="sb-label">📦 Collection Name</span>', unsafe_allow_html=True)
+    st.markdown('<span class="sb-label">Collection Name</span>', unsafe_allow_html=True)
     collection_name = st.text_input(
         "Collection", value="amazon_multimodal",
         label_visibility="collapsed",
@@ -935,7 +973,7 @@ with st.sidebar:
     st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
 
     # ── Model ──
-    st.markdown('<span class="sb-label">🤖 LLM Model</span>', unsafe_allow_html=True)
+    st.markdown('<span class="sb-label">LLM Model</span>', unsafe_allow_html=True)
     model_id = st.selectbox(
         "Model",
         options=[
@@ -947,10 +985,10 @@ with st.sidebar:
     )
 
     # ── Retrieval params ──
-    st.markdown('<span class="sb-label">🔍 Products to Retrieve (k)</span>', unsafe_allow_html=True)
+    st.markdown('<span class="sb-label">Chunks to Retrieve (K)</span>', unsafe_allow_html=True)
     k_val = st.slider("k", min_value=2, max_value=12, value=6, label_visibility="collapsed")
 
-    st.markdown('<span class="sb-label">⚖️ Image/Text Fusion Weight (α)</span>', unsafe_allow_html=True)
+    st.markdown('<span class="sb-label">Image/Text Fusion Weight (α)</span>', unsafe_allow_html=True)
     alpha = st.slider(
         "alpha", min_value=0.0, max_value=1.0, value=0.5, step=0.05,
         help="0 = text only, 0.5 = equal, 1.0 = image only",
@@ -960,7 +998,7 @@ with st.sidebar:
 
     # ── Strategy ──
     st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
-    st.markdown('<span class="sb-label">⚡ Query Strategy</span>', unsafe_allow_html=True)
+    st.markdown('<span class="sb-label">Query Strategy</span>', unsafe_allow_html=True)
     strategy = st.selectbox(
         "Strategy", options=list(STRATEGY_INFO.keys()),
         index=0, label_visibility="collapsed",
@@ -968,7 +1006,7 @@ with st.sidebar:
     st.caption(STRATEGY_INFO[strategy])
 
     st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
-    st.markdown('<span class="sb-label">🗄️ Database Status</span>', unsafe_allow_html=True)
+    st.markdown('<span class="sb-label">Database Status</span>', unsafe_allow_html=True)
 
     if Path(persist_dir).exists():
         try:
@@ -990,7 +1028,7 @@ with st.sidebar:
 
 
     # ── Session stats ──
-    st.markdown('<span class="sb-label">📊 Session Stats</span>', unsafe_allow_html=True)
+    st.markdown('<div class="sb-section-title">📊 Session Stats</div>', unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     c1.metric("Queries", st.session_state.total_queries)
     c2.metric("Products", st.session_state.total_products)
@@ -1004,7 +1042,7 @@ with st.sidebar:
     # ── History ──
     if st.session_state.history:
         st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
-        st.markdown('<span class="sb-label">🕑 Recent</span>', unsafe_allow_html=True)
+        st.markdown('<span class="sb-label">Recent Queries</span>', unsafe_allow_html=True)
         for item in reversed(st.session_state.history[-6:]):
             short = item["query"][:55] + ("…" if len(item["query"]) > 55 else "")
             mode_icon = {"Text only": "💬", "Image only": "🖼️", "Text + Image": "🔀"}.get(
@@ -1034,7 +1072,7 @@ with col_chat:
     query_disabled = (query_type == "Image only")
     query = st.text_area(
         "Your question",
-        placeholder="e.g. Wireless headphones with noise cancellation under $60",
+        placeholder="e.g. What are the best wireless headphones under $80?",
         height=90,
         label_visibility="collapsed",
         disabled=query_disabled,
@@ -1059,7 +1097,7 @@ with col_chat:
     # ── Submit row ──
     btn_col, badge_col = st.columns([1, 3])
     with btn_col:
-        submitted = st.button("Search →", use_container_width=True)
+        submitted = st.button("Ask →", use_container_width=True)
     with badge_col:
         st.markdown(
             f'<div style="padding-top:0.6rem">'
@@ -1069,7 +1107,7 @@ with col_chat:
         )
 
     # ── Sample queries ──
-    with st.expander("💡 Sample queries to try"):
+    with st.expander("💡 Sample questions to try"):
         cols = st.columns(2)
         for i, s in enumerate(SAMPLE_QUERIES):
             if cols[i % 2].button(s, key=f"sample_{i}"):
@@ -1095,7 +1133,7 @@ with col_chat:
             st.warning("Please upload an image.")
         else:
             display_query = query.strip() if query.strip() else "(image query)"
-            with st.spinner("🔍 Searching catalogue…"):
+            with st.spinner("Searching catalogue…"):
                 try:
                     t0 = time.time()
 
@@ -1307,10 +1345,9 @@ with col_chat:
         st.markdown("""
         <div class="empty-state">
           <div class="empty-icon">🛍️</div>
-          <div class="empty-title">Ready to find products</div>
+          <div class="empty-title">Ready to answer your questions</div>
           <div class="empty-sub">
-            Type a question, upload an image, or try both together.<br>
-            Switch query strategies in the sidebar to compare results.
+            Type a question above or choose a sample from the suggestions
           </div>
         </div>
         """, unsafe_allow_html=True)

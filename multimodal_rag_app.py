@@ -103,7 +103,7 @@ html, body, [class*="css"] {
     color: #ff9f1c;
 }
 .header-sub {
-    color: #5a7080;
+    color: #8aa0b0;
     font-size: 0.95rem;
     font-weight: 300;
     margin: 0;
@@ -125,9 +125,9 @@ section[data-testid="stSidebar"] {
 }
 .sb-label {
     font-family: 'DM Mono', monospace;
-    color: #ff9f1c;
-    font-size: 0.68rem;
-    letter-spacing: 0.16em;
+    color: #ffcc44;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     margin-bottom: 0.45rem;
     display: block;
@@ -140,24 +140,28 @@ section[data-testid="stSidebar"] {
 
 /* ── Input overrides ── */
 .stTextArea textarea, .stTextInput input {
-    background: rgba(255,255,255,0.03) !important;
-    border: 1px solid rgba(255,200,60,0.18) !important;
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,200,60,0.40) !important;
     border-radius: 10px !important;
-    color: #e8dfc8 !important;
+    color: #f5ede0 !important;
     font-family: 'DM Sans', sans-serif !important;
-    font-size: 0.97rem !important;
+    font-size: 1.0rem !important;
     caret-color: #ff9f1c !important;
     transition: border-color 0.2s, box-shadow 0.2s !important;
 }
+.stTextArea textarea::placeholder, .stTextInput input::placeholder {
+    color: #8aa0b0 !important;
+    opacity: 1 !important;
+}
 .stTextArea textarea:focus, .stTextInput input:focus {
-    border-color: rgba(255,159,28,0.55) !important;
-    box-shadow: 0 0 0 3px rgba(255,159,28,0.08) !important;
+    border-color: rgba(255,159,28,0.80) !important;
+    box-shadow: 0 0 0 3px rgba(255,159,28,0.14) !important;
 }
 
 /* ── File uploader ── */
 [data-testid="stFileUploader"] {
-    background: rgba(255,255,255,0.02) !important;
-    border: 1px dashed rgba(255,200,60,0.22) !important;
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px dashed rgba(255,200,60,0.50) !important;
     border-radius: 10px !important;
 }
 
@@ -308,7 +312,7 @@ section[data-testid="stSidebar"] {
     font-size: 0.68rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: #5a7080;
+    color: #8aa0b0;
     margin: 1.4rem 0 0.8rem;
     padding-top: 1rem;
     border-top: 1px solid rgba(255,200,60,0.08);
@@ -404,14 +408,14 @@ section[data-testid="stSidebar"] {
     font-size: 0.62rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #3a5060;
+    color: #8aa0b0;
 }
 
 /* ── Empty state ── */
 .empty-state {
     text-align: center;
     padding: 5rem 2rem;
-    color: #283845;
+    color: #8aa0b0;
 }
 .empty-icon {
     font-size: 3.5rem;
@@ -421,23 +425,23 @@ section[data-testid="stSidebar"] {
 .empty-title {
     font-family: 'DM Serif Display', serif;
     font-size: 1.5rem;
-    color: #344858;
+    color: #c8d8e8;
     margin-bottom: 0.6rem;
 }
 .empty-sub {
     font-size: 0.88rem;
-    color: #243040;
+    color: #8aa0b0;
 }
 
 /* ── Selectbox / slider ── */
 .stSelectbox label, .stSlider label, .stRadio label, label {
-    color: #6a8090 !important;
-    font-size: 0.82rem !important;
+    color: #c8d8e8 !important;
+    font-size: 0.88rem !important;
 }
 div[data-testid="stSelectbox"] > div {
-    background: rgba(255,255,255,0.03) !important;
-    border-color: rgba(255,200,60,0.18) !important;
-    color: #e0d8c8 !important;
+    background: rgba(255,255,255,0.06) !important;
+    border-color: rgba(255,200,60,0.40) !important;
+    color: #f5ede0 !important;
     border-radius: 8px !important;
 }
 
@@ -448,9 +452,9 @@ div[data-testid="stSelectbox"] > div {
 
 /* ── Expander ── */
 .streamlit-expanderHeader {
-    background: rgba(255,255,255,0.02) !important;
-    color: #6a8090 !important;
-    border-color: rgba(255,200,60,0.08) !important;
+    background: rgba(255,255,255,0.04) !important;
+    color: #c8d8e8 !important;
+    border-color: rgba(255,200,60,0.20) !important;
     border-radius: 8px !important;
 }
 
@@ -462,7 +466,7 @@ div[data-testid="stSelectbox"] > div {
 hr { border-color: rgba(255,200,60,0.08) !important; }
 
 /* ── Caption ── */
-.stCaption { color: #3a5060 !important; }
+.stCaption { color: #8aa0b0 !important; }
 </style>
 """, unsafe_allow_html=True)
 

@@ -6,7 +6,7 @@ Run with:
 
 Prerequisites:
     pip install streamlit open-clip-torch torch torchvision
-                chromadb Pillow requests huggingface_hub
+                chromadb Pillow requests openai
 
 The app connects to the ChromaDB vector store built in
 multimodal_rag_amazon_products.ipynb and answers product
@@ -16,7 +16,6 @@ queries using text, image, or both modalities.
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-import os
 import time
 import io
 import json
@@ -587,13 +586,6 @@ class _CLIPEmb:
         return _encode_texts(input).tolist()
 
 
-def _fuse(t_emb, i_emb, alpha=0.5):
-    import numpy as np
-    if i_emb is None:
-        return t_emb
-    f = (1 - alpha) * t_emb + alpha * i_emb
-    n = np.linalg.norm(f)
-    return (f / n).astype("float32") if n > 0 else f
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -662,12 +654,12 @@ def rrf_merge(lists, k_rrf=60, top_n=6):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def llm_call(messages: list[dict], hf_token: str, model_id: str,
-             max_tokens: int = 512, temperature: float = 0.1) -> str:
-    from groq import Groq
-    api_key = os.environ.get("GROQ_API_KEY", "")
+             max_tokens: int = 512, temperature: float = 0.0) -> str:
+    from openai import OpenAI
+    api_key = os.environ.get("OPENAI_API_KEY", "")
     if not api_key:
-        raise ValueError("GROQ_API_KEY is not set. Enter your Groq API key in the sidebar.")
-    client = Groq(api_key=api_key)
+        raise ValueError("OPENAI_API_KEY is not set. Enter your OpenAI API key in the sidebar.")
+    client = OpenAI(api_key=api_key)
     try:
         resp = client.chat.completions.create(
             model=model_id,
@@ -678,7 +670,7 @@ def llm_call(messages: list[dict], hf_token: str, model_id: str,
         return resp.choices[0].message.content.strip()
     except Exception as e:
         raise RuntimeError(
-            f"Groq API call failed: {e}\n"
+            f"OpenAI API call failed: {e}\n"
             "Check that your API key is valid and the model name is correct."
         ) from e
 
@@ -695,17 +687,6 @@ Only say "I couldn't find a matching product" if the context contains zero produ
 Never invent product names, prices, ratings, or features not present in the context."""
 
 
-def format_context(results):
-    parts = []
-    for i, r in enumerate(results, 1):
-        meta = r["meta"]
-        line = f"[Product {i}]\n{r['doc']}"
-        img = meta.get("image_url", "")
-        if img:
-            line += f"\nImage URL: {img}"
-        parts.append(line)
-    return "\n\n---\n\n".join(parts)
-
 import re
 
 def _clean_price(price: str) -> str:
@@ -713,12 +694,15 @@ def _clean_price(price: str) -> str:
     match = re.search(r'\$[\d,]+\.?\d*', str(price))
     return match.group(0) if match else price
 
-def format_context(results):
+def format_context(results, max_chars_per_product: int = 300):
+    """Format retrieved results as LLM context, truncating each product to avoid
+    overflowing the context window. Matches the notebook's format_product_docs()."""
     parts = []
     for i, r in enumerate(results, 1):
         meta = r["meta"]
         clean_price = _clean_price(meta.get("price", ""))
-        line = f"[Product {i}]\n{r['doc']}"
+        content = r["doc"][:max_chars_per_product]
+        line = f"[Product {i}]\n{content}"
         if clean_price:
             line += f"\nPrice: {clean_price}"
         img = meta.get("image_url", "")
@@ -773,7 +757,7 @@ def answer_standard(query, results, hf_token, model_id, query_type="Text only", 
 
 
 def answer_multi_query(query, collection_obj, k, alpha, query_image_pil,
-                       query_type, hf_token, model_id, n_alt=3):
+                       query_type, hf_token, model_id, n_alt=4):
     q = _effective_query(query, query_type, query_image_pil)
     # For image-only mode skip LLM alt-query generation (no text to rephrase);
     # use the image retrieval directly with a single pass
@@ -796,6 +780,46 @@ def answer_multi_query(query, collection_obj, k, alpha, query_image_pil,
         {"role": "user",   "content": f"Context:\n{ctx}\n\nQuestion: {q}"},
     ], hf_token, model_id)
     return answer, results, alternatives
+
+
+def answer_decomposition(query, collection_obj, k, alpha, query_image_pil,
+                         query_type, hf_token, model_id):
+    """Query Decomposition: break the question into sub-questions, answer each
+    independently with retrieved context, then synthesise into a final answer.
+    Matches the notebook's run_decomposition() implementation."""
+    q = _effective_query(query, query_type, query_image_pil)
+
+    # Step 1: generate sub-questions
+    raw_subs = llm_call([
+        {"role": "user", "content":
+         "Break this Amazon product question into 3 simpler sub-questions.\n"
+         "One per line, no numbering.\n"
+         f"Question: {q}"},
+    ], hf_token, model_id, max_tokens=200)
+    sub_questions = [s.strip() for s in raw_subs.strip().splitlines() if s.strip()][:4]
+
+    # Step 2: answer each sub-question with its own retrieval pass
+    sub_answers = []
+    all_results = []
+    for sq in sub_questions:
+        sq_results = retrieve(sq, None, "Text only", collection_obj, k, alpha)
+        all_results.extend(sq_results)
+        sq_ctx = format_context(sq_results)
+        sq_ans = llm_call([
+            {"role": "system", "content": RAG_SYSTEM},
+            {"role": "user",   "content": f"Context:\n{sq_ctx}\n\nQuestion: {sq}"},
+        ], hf_token, model_id)
+        sub_answers.append((sq, sq_ans))
+
+    # Step 3: synthesise
+    synthesis_text = "\n".join(f"Q: {sq}\nA: {sa}" for sq, sa in sub_answers)
+    answer = llm_call([
+        {"role": "system", "content": "Synthesize the sub-answers into one coherent answer."},
+        {"role": "user",   "content": f"Original question: {q}\n\n{synthesis_text}"},
+    ], hf_token, model_id)
+
+    results = list({r["doc"][:120]: r for r in all_results}.values())  # dedupe
+    return answer, results, sub_questions
 
 
 def answer_rag_fusion(query, collection_obj, k, alpha, query_image_pil,
@@ -865,8 +889,11 @@ def answer_step_back(query, collection_obj, k, alpha, query_image_pil,
     else:
         abstract = llm_call([
             {"role": "user", "content":
-             f"Rewrite this specific product question as a broader product category question.\n"
-             f"Specific: {q}\nAbstract:"},
+             "Rewrite this specific product question as a broader product category question.\n"
+             "Examples:\n"
+             "  Specific: 'Sony WH-1000XM5 headphones'  → Abstract: 'noise-cancelling headphones'\n"
+             "  Specific: 'best standing desk under $300' → Abstract: 'ergonomic office furniture'\n"
+             f"\nSpecific: {q}\nAbstract:"},
         ], hf_token, model_id, max_tokens=80)
         abstract = abstract.strip().splitlines()[0]
         spec = retrieve(query, query_image_pil, query_type, collection_obj, k, alpha)
@@ -892,11 +919,12 @@ def pil_to_b64(img):
 
 
 STRATEGY_INFO = {
-    "Standard":     "Direct CLIP similarity search — fastest, reliable for clear queries.",
-    "Multi-Query":  "LLM generates alternative phrasings; results are unioned — great for ambiguous questions.",
-    "RAG-Fusion":   "Alternative phrasings reranked by Reciprocal Rank Fusion — highest retrieval quality.",
-    "HyDE":         "Generates a hypothetical product listing first, then searches — bridges casual language and catalogue terms.",
-    "Step-Back":    "Retrieves for both the specific and a broader category query — useful for 'what type of X…' questions.",
+    "Standard":       "Direct CLIP similarity search — fastest, reliable for clear queries.",
+    "Multi-Query":    "LLM generates alternative phrasings; results are unioned — great for ambiguous questions.",
+    "RAG-Fusion":     "Alternative phrasings reranked by Reciprocal Rank Fusion — highest retrieval quality.",
+    "Decomposition":  "Breaks complex questions into sub-questions, answers each independently, then synthesises — best for multi-faceted queries.",
+    "HyDE":           "Generates a hypothetical product listing first, then searches — bridges casual language and catalogue terms.",
+    "Step-Back":      "Retrieves for both the specific and a broader category query — useful for 'what type of X…' questions.",
 }
 
 SAMPLE_QUERIES = [
@@ -944,15 +972,15 @@ with st.sidebar:
     st.markdown('<div class="sb-section-title">⚙ Configuration</div>', unsafe_allow_html=True)
 
     # ── Credentials ──
-    st.markdown('<span class="sb-label">Groq API Key</span>', unsafe_allow_html=True)
-    groq_key_input = st.text_input(
-        "Groq Key", type="password",
-        value=os.environ.get("GROQ_API_KEY", ""),
-        placeholder="gsk_...",
+    st.markdown('<span class="sb-label">OpenAI API Key</span>', unsafe_allow_html=True)
+    openai_key_input = st.text_input(
+        "OpenAI Key", type="password",
+        value=os.environ.get("OPENAI_API_KEY", ""),
+        placeholder="sk-...",
         label_visibility="collapsed",
     )
-    if groq_key_input:
-        os.environ["GROQ_API_KEY"] = groq_key_input
+    if openai_key_input:
+        os.environ["OPENAI_API_KEY"] = openai_key_input
     hf_token = ""  # kept for function signatures, unused
 
     st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
@@ -977,9 +1005,9 @@ with st.sidebar:
     model_id = st.selectbox(
         "Model",
         options=[
-            "llama-3.1-8b-instant",
-            "llama-3.3-70b-versatile",
-            "mixtral-8x7b-32768",
+            "gpt-4.1-mini",
+            "gpt-4o-mini",
+            "gpt-4.1",
         ],
         label_visibility="collapsed",
     )
@@ -1123,8 +1151,8 @@ with col_chat:
         text_ok  = bool(query.strip()) or query_type == "Image only"
         image_ok = (query_image_pil is not None) or (query_type == "Text only")
 
-        if not os.environ.get("GROQ_API_KEY"):
-            st.error("⚠️ Enter your Groq API key in the sidebar.")
+        if not os.environ.get("OPENAI_API_KEY"):
+            st.error("⚠️ Enter your OpenAI API key in the sidebar.")
         elif not Path(persist_dir).exists():
             st.error(f"⚠️ ChromaDB not found at `{persist_dir}`. Run the indexing notebook first.")
         elif not text_ok:
@@ -1165,6 +1193,13 @@ with col_chat:
                             query_image_pil, query_type, hf_token, model_id
                         )
                         extra_info["alternatives"] = alts
+
+                    elif strategy == "Decomposition":
+                        answer, results, sub_qs = answer_decomposition(
+                            display_query, col_obj, k_val, alpha,
+                            query_image_pil, query_type, hf_token, model_id
+                        )
+                        extra_info["sub_questions"] = sub_qs
 
                     elif strategy == "HyDE":
                         answer, results, hypo = answer_hyde(
@@ -1265,6 +1300,10 @@ with col_chat:
             with st.expander("🔀 Alternative queries generated"):
                 for alt in extra["alternatives"]:
                     st.markdown(f"- `{alt}`")
+        if extra.get("sub_questions"):
+            with st.expander("🔍 Sub-questions used for Decomposition"):
+                for sq in extra["sub_questions"]:
+                    st.markdown(f"- {sq}")
         if extra.get("hypothetical"):
             with st.expander("💭 Hypothetical product used for HyDE search"):
                 st.markdown(f"_{extra['hypothetical'][:400]}_")

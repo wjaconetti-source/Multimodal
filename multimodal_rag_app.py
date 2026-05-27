@@ -1029,7 +1029,7 @@ with st.sidebar:
     st.markdown('<span class="sb-label">Query Strategy</span>', unsafe_allow_html=True)
     strategy = st.selectbox(
         "Strategy", options=list(STRATEGY_INFO.keys()),
-        index=0, label_visibility="collapsed",
+        index=4, label_visibility="collapsed",
     )
     st.caption(STRATEGY_INFO[strategy])
 
